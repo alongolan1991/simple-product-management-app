@@ -1,76 +1,80 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { connect } from "react-redux";
+import { getActiveProductDetails } from "../../redux/selectors/products.selectors";
+import {updateProduct} from '../../redux/actions/products.action';
 
-const ProductDetails = ({ item, updateProduct }) => {
-  const { id, description, image, price, name } = item;
-  let nameInput = null;
-  let descriptionInput = null;
-  let priceInputt = null;
+const ProductDetails = ({ product, updateProduct }) => {
+  const [copyProduct, setProduct] = useState(product);
+  const { id, name, description, image, price } = copyProduct  || {};
+
+
+  useEffect(() => {
+    setProduct(product);
+  }, [product]);
 
   const validateDetails = () => {
-    if (nameInput.value.length > 30 || nameInput.value.length === 0) {
+    if (name > 30 || name.length === 0) {
       alert("name can contain up to 30 characters & can not be empty");
       return;
     }
 
-    if (descriptionInput.value.length > 200) {
+    if (description.length > 200) {
       alert("description can contain up to 200 characters");
       return;
     }
 
-    if (priceInputt.value <= 0) {
+    if (price.value <= 0) {
       alert("price must be greater then 0");
       return;
     }
 
-    let tempProduct = {
-      id: id,
-      name: nameInput.value,
-      image:
-        "https://i.pinimg.com/originals/26/76/3d/26763d481172f5dc599d151570b38ded.png",
-      description: descriptionInput.value,
-      price: priceInputt.value
-    };
+    updateProduct(copyProduct);
+  };
 
-    updateProduct(tempProduct);
+  const setCopyProduct = (e, type) => {
+    setProduct({ ...copyProduct, [type]: e.target.value });
   };
 
   return (
     <>
-      <DetailsContainer>
-        <ProductImage src={image} />
-        <FormControl>
-          <Label>Name</Label>
-          <Input
-            ref={el => (nameInput = el)}
-            maxLength="30"
-            required
-            placeholder={name}
-          />
-        </FormControl>
-        <FormControl>
-          <Label>Description</Label>
-          <TextArea
-            ref={el => (descriptionInput = el)}
-            rows="4"
-            maxLength="200"
-            placeholder={description}
-          />
-        </FormControl>
-        <FormControl>
-          <Label>Price</Label>
-          <PriceSection>
-            <Inputprice
-              ref={el => (priceInputt = el)}
-              type="number"
-              min="1"
-              placeholder={price}
-            />{" "}
-            $
-          </PriceSection>
-        </FormControl>
-        <SaveButton onClick={validateDetails}>Save</SaveButton>
-      </DetailsContainer>
+        {copyProduct === undefined ? null :
+        <DetailsContainer>
+          <ProductImage src={image} />
+          <FormControl>
+            <Label>Name</Label>
+            <Input
+              value={name}
+              onChange={e => setCopyProduct(e, "name")}
+              maxLength="30"
+              required
+              placeholder={name}
+            />
+          </FormControl>
+          <FormControl>
+            <Label>Description</Label>
+            <TextArea
+              rows="4"
+              value={description}
+              onChange={e => setCopyProduct(e, "description")}
+              maxLength="200"
+              placeholder={description}
+            />
+          </FormControl>
+          <FormControl>
+            <Label>Price</Label>
+            <PriceSection>
+              <Inputprice
+                onChange={e => setCopyProduct(e, "price")}
+                type="number"
+                min="1"
+                value={price}
+              />
+            </PriceSection>
+          </FormControl>
+          <SaveButton onClick={validateDetails}>Save</SaveButton>
+        </DetailsContainer>
+        }
     </>
   );
 };
@@ -115,4 +119,18 @@ const SaveButton = styled.button`
   align-self: flex-end;
 `;
 
-export default ProductDetails;
+const mapStateToProps = state => {
+  return {
+    product: getActiveProductDetails(state)
+  };
+};
+
+const mapDispatchToProps = dispatch => ({
+  updateProduct: product =>
+    dispatch(updateProduct(product))
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ProductDetails);

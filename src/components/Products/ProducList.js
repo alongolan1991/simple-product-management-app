@@ -1,20 +1,18 @@
 import React from "react";
 import styled from "styled-components";
 import ProductItem from "./ProductItem";
+import { connect } from "react-redux";
 
-const productList = ({ item, itemClicked, activeItem, deleteProduct }) => {
+const ProductList = ({ productsList, search }) => {
+  const newArray = productsList.filter(elem => {
+    return elem.name.includes(search);
+  });
   return (
     <>
       <Container>
-        {item.map((item, index) => {
-            console.log('activeItem: ', activeItem, 'id: ', item.id);
+        {newArray.map((product, index) => {
           return (
-            <ProductItem
-              deleteProduct={() => deleteProduct(index)}
-              activeItem={activeItem === item.id}
-              item={item}
-              itemClicked={itemClicked}
-            />
+            <ProductItem key={product.id} product={product} index={index} />
           );
         })}
       </Container>
@@ -26,6 +24,20 @@ const Container = styled.section`
   display: flex;
   flex-direction: column;
   margin-right: 10px;
-  justify-content: space-between;
+  justify-content: start;
+  width: 60%;
 `;
-export default productList;
+
+const mapStateToProps = state => {
+  return {
+    productsList: state.products.productList
+  };
+};
+const mapDispatchToProps = dispatch => {
+  return {};
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ProductList);

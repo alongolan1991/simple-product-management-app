@@ -1,11 +1,12 @@
 import React from "react";
 import Styled from "styled-components";
+import { connect } from "react-redux";
 
-const ToolBar = ({addProduct, checkSearch}) => {
+const ToolBar = ({ addProduct, checkSearch, serachValue }) => {
   return (
     <Bar>
       <AddButton onClick={addProduct}>+ Add</AddButton>
-      <SearchInput onChange={(e) => checkSearch(e)} />
+      <SearchInput value={serachValue} onChange={e => checkSearch(e)} />
       Sort by
       <SelectButton>
         <option value="name">Name</option>
@@ -34,4 +35,15 @@ const SelectButton = Styled.select`
 margin-left : 5px;
 `;
 
-export default ToolBar;
+const mapStateToProps = state => {
+  return {};
+};
+
+const mapDispatchToProps = dispatch => {
+  return {};
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ToolBar);
